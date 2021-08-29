@@ -1,0 +1,345 @@
+##################################################################################################
+# details-custom service
+##################################################################################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: details-custom
+  namespace: bookinfo
+  labels:
+    app: details-custom
+    service: details-custom
+spec:
+  ports:
+  - port: 9080
+    name: http
+  selector:
+    app: details-custom
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: bookinfo-details-custom
+  namespace: bookinfo
+  labels:
+    account: details-custom
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: details-custom-v1
+  namespace: bookinfo
+  labels:
+    app: details-custom
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: details-custom
+      version: v1
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: details-custom
+        version: v1
+    spec:
+      serviceAccountName: bookinfo-details-custom
+      containers:
+      - name: details-custom
+        image: maistra/examples-bookinfo-details-v1:2.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 9080
+---
+##################################################################################################
+# Ratings-custom service
+##################################################################################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: ratings-custom
+  namespace: bookinfo
+  labels:
+    app: ratings-custom
+    service: ratings-custom
+spec:
+  ports:
+  - port: 9080
+    name: http
+  selector:
+    app: ratings-custom
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: bookinfo-ratings-custom
+  namespace: bookinfo
+  labels:
+    account: ratings-custom
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ratings-custom-v1
+  namespace: bookinfo
+  labels:
+    app: ratings-custom
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ratings-custom
+      version: v1
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: ratings-custom
+        version: v1
+    spec:
+      serviceAccountName: bookinfo-ratings-custom
+      containers:
+      - name: ratings-custom
+        image: maistra/examples-bookinfo-ratings-v1:2.0.0
+        imagePullPolicy: IfNotPresent
+        env:
+          # ratings-custom-v2 will use mongodb as the default db backend.
+          # if you would like to use mysqldb then you can use this file
+          # which sets DB_TYPE = 'mysql' and the rest of the parameters shown
+          # here and also create the # mysqldb service using bookinfo-mysql.yaml
+          # NOTE: This file is mutually exclusive to bookinfo-ratings-custom-v2.yaml
+          - name: DB_TYPE
+            value: "mysql"
+          - name: MYSQL_DB_HOST
+            value: mysql.external
+          - name: MYSQL_DB_PORT
+            value: "3306"
+          - name: MYSQL_DB_USER
+            value: bookinfo
+          - name: MYSQL_DB_PASSWORD
+            value: bookinfo
+        ports:
+        - containerPort: 9080
+---
+##################################################################################################
+# Reviews-custom service
+##################################################################################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: reviews-custom
+  namespace: bookinfo
+  labels:
+    app: reviews-custom
+    service: reviews-custom
+spec:
+  ports:
+  - port: 9080
+    name: http
+  selector:
+    app: reviews-custom
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: bookinfo-reviews-custom
+  namespace: bookinfo
+  labels:
+    account: reviews-custom
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reviews-custom-v1
+  namespace: bookinfo
+  labels:
+    app: reviews-custom
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: reviews-custom
+      version: v1
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: reviews-custom
+        version: v1
+    spec:
+      serviceAccountName: bookinfo-reviews-custom
+      containers:
+      - name: reviews-custom
+        image: maistra/examples-bookinfo-reviews-v1:2.0.0
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: LOG_DIR
+          value: "/tmp/logs"
+        ports:
+        - containerPort: 9080
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+        - name: wlp-output
+          mountPath: /opt/ibm/wlp/output
+      volumes:
+      - name: wlp-output
+        emptyDir: {}
+      - name: tmp
+        emptyDir: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reviews-custom-v2
+  namespace: bookinfo
+  labels:
+    app: reviews-custom
+    version: v2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: reviews-custom
+      version: v2
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: reviews-custom
+        version: v2
+    spec:
+      serviceAccountName: bookinfo-reviews-custom
+      containers:
+      - name: reviews-custom
+        image: maistra/examples-bookinfo-reviews-v2:2.0.0
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: LOG_DIR
+          value: "/tmp/logs"
+        ports:
+        - containerPort: 9080
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+        - name: wlp-output
+          mountPath: /opt/ibm/wlp/output
+      volumes:
+      - name: wlp-output
+        emptyDir: {}
+      - name: tmp
+        emptyDir: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reviews-custom-v3
+  namespace: bookinfo
+  labels:
+    app: reviews-custom
+    version: v3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: reviews-custom
+      version: v3
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: reviews-custom
+        version: v3
+    spec:
+      serviceAccountName: bookinfo-reviews-custom
+      containers:
+      - name: reviews-custom
+        image: maistra/examples-bookinfo-reviews-v3:2.0.0
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: LOG_DIR
+          value: "/tmp/logs"
+        ports:
+        - containerPort: 9080
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+        - name: wlp-output
+          mountPath: /opt/ibm/wlp/output
+      volumes:
+      - name: wlp-output
+        emptyDir: {}
+      - name: tmp
+        emptyDir: {}
+---
+##################################################################################################
+# Productpage-custom services
+##################################################################################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: productpage-custom
+  namespace: bookinfo
+  labels:
+    app: productpage-custom
+    service: productpage-custom
+spec:
+  ports:
+  - port: 9080
+    name: http
+  selector:
+    app: productpage-custom
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: bookinfo-productpage-custom
+  namespace: bookinfo
+  labels:
+    account: productpage-custom
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: productpage-custom-v1
+  namespace: bookinfo
+  labels:
+    app: productpage-custom
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: productpage-custom
+      version: v1
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: productpage-custom
+        version: v1
+    spec:
+      serviceAccountName: bookinfo-productpage-custom
+      containers:
+      - name: productpage-custom
+        image: maistra/examples-bookinfo-productpage-v1:2.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 9080
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+      volumes:
+      - name: tmp
+        emptyDir: {}
+---
