@@ -1,0 +1,84 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: reviews
+  namespace: bookinfo
+spec:
+  hosts:
+  - reviews
+  exportTo:
+  - .
+  gateways:
+  - mesh
+  http:
+  - match:
+    - sourceLabels:
+        app: productpage
+    route:
+    - destination:
+        host: reviews
+        subset: v3
+  - match:
+    - sourceLabels:
+        app: productpage-custom
+    route:
+    - destination:
+        host: reviews-custom
+        subset: v3
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: ratings
+  namespace: bookinfo
+spec:
+  hosts:
+  - ratings
+  exportTo:
+  - .
+  gateways:
+  - mesh
+  http:
+  - match:
+    - sourceLabels:
+        app: reviews
+    route:
+    - destination:
+        host: ratings
+        subset: v2-mysql
+  - match:
+    - sourceLabels:
+        app: reviews-custom
+    route:
+    - destination:
+        host: ratings-custom
+        subset: v2-mysql
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: details
+  namespace: bookinfo
+spec:
+  hosts:
+  - details
+  exportTo:
+  - .
+  gateways:
+  - mesh
+  http:
+  - match:
+    - sourceLabels:
+        app: productpage
+    route:
+    - destination:
+        host: details
+        subset: v1
+  - match:
+    - sourceLabels:
+        app: productpage-custom
+    route:
+    - destination:
+        host: details-custom
+        subset: v1
+---
