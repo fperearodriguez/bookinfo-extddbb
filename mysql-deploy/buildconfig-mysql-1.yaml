@@ -1,0 +1,43 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: mysql-1
+  namespace: ddbb
+spec:
+  failedBuildsHistoryLimit: 5
+  nodeSelector: null
+  output:
+    to:
+      kind: ImageStreamTag
+      name: mysql-1:latest
+      namespace: ddbb
+  postCommit: {}
+  resources: {}
+  runPolicy: Serial
+  source:
+    contextDir: examples/mysql-1/extend-image/
+    git:
+      ref: main
+      uri: https://github.com/fperearodriguez/bookinfo-extddbb.git
+    sourceSecret:
+      name: MyAwesomeSecretName
+    type: Git
+  strategy:
+    sourceStrategy:
+      env:
+      - name: MYSQL_USER
+        value: MyAwesomeUser
+      - name: MYSQL_PASSWORD
+        value: MyAwesomePass
+      - name: MYSQL_DATABASE
+        value: test
+      - name: MYSQL_BOOKUSER
+        value: bookinfo
+      - name: MYSQL_BOOKPASSWORD
+        value: bookinfo
+      from:
+        kind: ImageStreamTag
+        name: mysql:8.0-el8
+        namespace: openshift
+    type: Source
+  successfulBuildsHistoryLimit: 5

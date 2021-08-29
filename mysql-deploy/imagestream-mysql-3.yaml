@@ -1,0 +1,8 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: mysql-3
+  namespace: ddbb
+spec:
+  lookupPolicy:
+    local: false
