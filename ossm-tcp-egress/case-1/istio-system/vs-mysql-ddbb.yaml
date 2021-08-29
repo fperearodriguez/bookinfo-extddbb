@@ -1,0 +1,21 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: mysql
+  namespace: istio-system
+spec:
+  exportTo:
+  - .
+  gateways:
+  - istio-default-egress
+  hosts:
+  - mysql.external
+  tcp:
+  - match:
+    - gateways:
+      - istio-default-egress
+      port: 443
+    route:
+    - destination:
+        host: mysql.external
+      weight: 100

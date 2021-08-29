@@ -1,0 +1,15 @@
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: istio-default-egress
+  namespace: istio-system
+spec:
+  selector:
+    istio: default-egress
+  servers:
+  - hosts:
+    - mysql.external
+    port:
+      name: tcp-443
+      number: 443
+      protocol: TCP
