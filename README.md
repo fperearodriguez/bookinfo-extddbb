@@ -43,20 +43,33 @@ oc new-project ddbb
 
 Create ImageStream
 ```
-oc apply -f mysql-deploy/imagestream-mysql.yaml
+oc apply -f mysql-deploy/imagestream-mysql-1.yaml
+oc apply -f mysql-deploy/imagestream-mysql-2.yaml
+oc apply -f mysql-deploy/imagestream-mysql-3.yaml
+```
+
+Create secret with MySQL credentials used by buildconfig
+```
+oc create secret generic mysql-credentials-1 --from-env-file=./mysql-deploy/params.env
+oc create secret generic mysql-credentials-2 --from-env-file=./mysql-deploy/params-2.env
+oc create secret generic mysql-credentials-3 --from-env-file=./mysql-deploy/params-3.env
 ```
 
 Update the mandatory fields in the buildconfig file and create it
 ```
 oc apply -f mysql-deploy/buildconfig-mysql-1.yaml
+oc apply -f mysql-deploy/buildconfig-mysql-2.yaml
+oc apply -f mysql-deploy/buildconfig-mysql-3.yaml
 ```
 
 Run buildconfig
 ```
 oc start-build mysql-1
+oc start-build mysql-2
+oc start-build mysql-3
 ```
 
-Now, the _mysql-1_ image is available in the Openshift Internal Registry.
+Now, the _mysql-1_, _mysql-2_ and _mysql-3_ images are available in the Openshift Internal Registry.
 
 Deploy mysql-1
 ```Shell
