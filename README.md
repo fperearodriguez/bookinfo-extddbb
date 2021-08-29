@@ -26,7 +26,7 @@ Three MySQL instances are deployed outside the Mesh in the _ddbb_ project: mysql
 * mysql-2: Ratings point equals 5.
 * mysql-3: Ratings point equals 3.
 
-MySQL instances have been deployed using [BuildConfigs](https://docs.openshift.com/container-platform/4.8/cicd/builds/understanding-buildconfigs.html#builds-buildconfig_understanding-builds). A MySQL image is customized for this use case using the files located in [examples/extend-image/](./examples/extend-image/) and pushed into the OCP registry. You can see the BuildConfig template that I have used [here](./mysql-deploy/buildconfig.yaml).
+MySQL instances have been deployed using [BuildConfigs](https://docs.openshift.com/container-platform/4.8/cicd/builds/understanding-buildconfigs.html#builds-buildconfig_understanding-builds). A MySQL image is customized for this use case using the files located in the [examples](./examples/) folder and pushed into the OCP registry. You can see the BuildConfig template that I have used [here](./mysql-deploy/).
 
 For this example you can use any MySQL instance.
 
@@ -147,6 +147,7 @@ oc apply -f examples/bookinfo/virtual-service-ratings-mysql.yaml
 
 At this moment, the bookinfo application is trying to retrieve the ratings info from the external DDBB. As you can see, the ratings service is currently unavailable. Now, it's time to create the Istio objects to route the traffic through an egress Gateway in order to reach the external DDBB.
 
+Create Istio objects
 ```
 for file in ossm-tcp-egress/case-1/**/*.yaml; do oc apply -f $file; done
 ```
@@ -181,18 +182,35 @@ It is time to deploy the custom bookinfo application. Now, two bookinfo applicat
 
 Deploy custom bookinfo application
 ```
-oc apply -f examples/bookinfo/custom/bookinfo.yaml
+oc apply -f examples/bookinfo/custom/bookinfo-custom.yaml
 oc apply -f examples/bookinfo/custom/bookinfo-gateway.yaml
-oc apply -f examples/bookinfo/custom/destination-rule-all-mtls.yaml
+oc apply -f examples/bookinfo/custom/ocp-route-custom.yaml
+oc apply -f examples/bookinfo/custom/destination-rule-all-mtls_custom.yaml
 ```
 
-At this point, the bookinfo application is up and running, but ratings application is consuming the internal database instead of the MySQL deployed previously. The application is accessible from outside the cluster using the ingress gateway.
+Deploy ratings application with MySQL configuration
 ```
-export GATEWAY_URL=$(oc -n istio-system get route istio-ingressgateway -o jsonpath='{.spec.host}')
+oc process -f examples/bookinfo/custom/bookinfo-ratings-v2-mysql_custom.yaml --param-file=./examples/bookinfo/custom/params.env | oc apply -f -
+```
+Route all the traffic destined to the _reviews_ service to its __v3__ version and route all the traffic destined to the _ratings_ service to _ratings v2-mysql_ that uses the MySQL databases previously deployed.
+```
+oc apply -f examples/bookinfo/custom/virtual-service-ratings-mysql_custom.yaml
+```
+
+At this point, the bookinfo application is up and running and set with external database, but ratings application is not able to retrieve any data from _mysql-3_ instance. 
+```
+export GATEWAY_URL=$(oc get route bookinfo-bookinfo-gateway-custom -n istio-system -o jsonpath='{.spec.host}')
 curl $GATEWAY_URL/productpage -I
 ```
 
+Now, it's time to create the Istio objects to route the traffic through an egress Gateway in order to reach the _mysql-3_ external DDBB.
 
+Create Istio objects
+```
+for file in ossm-tcp-egress/case-2/**/*.yaml; do oc apply -f $file; done
+```
+
+Once created the Istio objects, ratings service should works and retrieve data from the _mysql-3_ external database. Bookinfo and bookinfo-custom applications are working properly now.
 
 
 ## Case 2: Egress TCP/TLS using Service Entry. TLS routing from sidecar to egress and TCP routing from egress to external service.
