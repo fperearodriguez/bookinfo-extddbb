@@ -117,7 +117,7 @@ Deploy bookinfo application
 oc apply -f examples/bookinfo/bookinfo.yaml
 ```
 
-Get ingress domain and replace the $EXTERNAL_DOMAIN variable in _examples/bookinfo/bookinfo-gateway.yaml_ file.
+Get ingress domain and replace the $EXTERNAL_DOMAIN variable in _examples/bookinfo/bookinfo-gateway.yaml_ and _examples/bookinfo/ocp-route.yaml_ files
 ```
 oc -n openshift-ingress-operator get ingresscontrollers default -o json | jq -r '.status.domain'
 ```
@@ -174,7 +174,7 @@ In this use case, the traffic flow is:
 2. The Virtual Service and Destination Rule objects route the request from the sidecar (bookinfo) to the egress Gateway (istio-system).
 3. At this point, the Virtual Service and Service Entry objects resolve the endpoints and route the traffic through the egress Gateway.
 
-<img src="./examples/bookinfo/custom/diagram_with_custom_app.png" alt="Bookinfo app" width=50%>
+<img src="./examples/bookinfo/custom/diagram_with_custom_app.png" alt="Bookinfo app" width=100%>
 
 ### Deploy Custom Bookinfo application
 It is time to deploy the custom bookinfo application. Now, two bookinfo applications will be running in _bookinfo_ project.
