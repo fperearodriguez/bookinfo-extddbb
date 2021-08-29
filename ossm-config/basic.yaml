@@ -1,0 +1,128 @@
+apiVersion: maistra.io/v2
+kind: ServiceMeshControlPlane
+metadata:
+  name: basic
+  namespace: istio-system
+spec:
+  addons:
+    grafana:
+      enabled: true
+    kiali:
+      enabled: true
+    prometheus:
+      enabled: true
+  gateways:
+    additionalEgress:
+      default-egress:
+        enabled: true
+        namespace: istio-system
+        runtime:
+          container:
+            resources:
+              limits:
+                cpu: 600m
+                memory: 256Mi
+              requests:
+                cpu: 100m
+                memory: 128Mi
+          deployment:
+            autoScaling:
+              enabled: false
+            replicas: 1
+            strategy:
+              rollingUpdate:
+                maxSurge: "1"
+                maxUnavailable: "0"
+              type: RollingUpdate
+        service:
+          metadata:
+            labels:
+              app: default-egress
+              gatewayType: egress
+              istio: default-egress
+          ports:
+          - name: https
+            port: 443
+            targetPort: 8443
+          - name: https-9443
+            port: 9443
+            targetPort: 8444
+          - name: http2
+            port: 80
+            targetPort: 8080
+          - name: status-port
+            port: 15020
+    egress:
+      enabled: false
+      service: {}
+    ingress:
+      runtime:
+        container:
+          resources:
+            limits:
+              cpu: 600m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+        deployment:
+          autoScaling:
+            enabled: false
+          replicas: 1
+      service:
+        metadata:
+          labels:
+            gatewayType: ingress
+            istio: ingressgateway
+        ports:
+        - name: http2
+          port: 80
+          targetPort: 8080
+        - name: https
+          port: 443
+          targetPort: 8443
+        - name: tls
+          port: 15443
+          targetPort: 15443
+        - name: status-port
+          port: 15020
+          targetPort: 15020
+        type: ClusterIP
+    openshiftRoute:
+      enabled: false
+  general:
+    logging:
+      componentLevels:
+        default: info
+    validationMessages: false
+  policy:
+    type: Istiod
+  profiles:
+  - default
+  proxy:
+    logging:
+      level: debug
+    networking:
+      trafficControl:
+        inbound: {}
+        outbound:
+          policy: REGISTRY_ONLY
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 128Mi
+  security:
+    controlPlane:
+      mtls: true
+    dataPlane:
+      automtls: true
+      mtls: true
+  telemetry:
+    type: Istiod
+  tracing:
+    sampling: 10000
+    type: Jaeger
+  version: v2.0
