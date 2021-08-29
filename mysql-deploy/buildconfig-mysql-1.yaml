@@ -25,16 +25,31 @@ spec:
   strategy:
     sourceStrategy:
       env:
-      - name: MYSQL_USER
-        value: MyAwesomeUser
-      - name: MYSQL_PASSWORD
-        value: MyAwesomePass
-      - name: MYSQL_DATABASE
-        value: test
-      - name: MYSQL_BOOKUSER
-        value: bookinfo
-      - name: MYSQL_BOOKPASSWORD
-        value: bookinfo
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: mysql-credentials-1
+              key: MYSQL_USER
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-credentials-1
+              key: MYSQL_PASSWORD
+        - name: MYSQL_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: mysql-credentials-1
+              key: MYSQL_DATABASE
+        - name: MYSQL_BOOKUSER
+          valueFrom:
+            secretKeyRef:
+              name: mysql-credentials-1
+              key: MYSQL_BOOKUSER
+        - name: MYSQL_BOOKPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-credentials-1
+              key: MYSQL_BOOKPASSWORD
       from:
         kind: ImageStreamTag
         name: mysql:8.0-el8
