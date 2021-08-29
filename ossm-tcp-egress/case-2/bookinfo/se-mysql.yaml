@@ -1,0 +1,16 @@
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: mysql
+  namespace: bookinfo
+spec:
+  exportTo:
+  - .
+  hosts:
+  - "mysql.external"
+  - "mysql-3.external"
+  location: MESH_INTERNAL
+  ports:
+  - name: tcp
+    number: 3306
+    protocol: TCP

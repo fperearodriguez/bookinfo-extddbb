@@ -1,0 +1,21 @@
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: mysql-3
+  namespace: istio-system
+spec:
+  exportTo:
+  - '.'
+  endpoints:
+  - address: mysql-3.ddbb.svc.cluster.local
+    ports:
+      tcp: 3306
+    weight: 100
+  hosts:
+  - mysql-3.external
+  location: MESH_EXTERNAL
+  ports:
+  - name: tcp
+    number: 3306
+    protocol: TCP
+  resolution: DNS
