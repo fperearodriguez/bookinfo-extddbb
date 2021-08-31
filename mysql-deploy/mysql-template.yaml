@@ -28,17 +28,17 @@ objects:
         port: 3306
       selector:
         name: ${DATABASE_SERVICE_NAME}
-  - apiVersion: v1
-    kind: PersistentVolumeClaim
-    metadata:
-      name: ${DATABASE_SERVICE_NAME}
-      namespace: ${NAMESPACE}
-    spec:
-      accessModes:
-      - ReadWriteOnce
-      resources:
-        requests:
-          storage: ${VOLUME_CAPACITY}
+  # - apiVersion: v1
+  #   kind: PersistentVolumeClaim
+  #   metadata:
+  #     name: ${DATABASE_SERVICE_NAME}
+  #     namespace: ${NAMESPACE}
+  #   spec:
+  #     accessModes:
+  #     - ReadWriteOnce
+  #     resources:
+  #       requests:
+  #         storage: ${VOLUME_CAPACITY}
   - apiVersion: v1
     kind: DeploymentConfig
     metadata:
@@ -115,13 +115,13 @@ objects:
             resources:
               limits:
                 memory: ${MEMORY_LIMIT}
-            volumeMounts:
-            - mountPath: /var/lib/mysql/data
-              name: ${DATABASE_SERVICE_NAME}-data
-          volumes:
-          - name: ${DATABASE_SERVICE_NAME}-data
-            persistentVolumeClaim:
-              claimName: ${DATABASE_SERVICE_NAME}
+          #   volumeMounts:
+          #   - mountPath: /var/lib/mysql/data
+          #     name: ${DATABASE_SERVICE_NAME}-data
+          # volumes:
+          # - name: ${DATABASE_SERVICE_NAME}-data
+          #   persistentVolumeClaim:
+          #     claimName: ${DATABASE_SERVICE_NAME}
       triggers:
       - imageChangeParams:
           automatic: true
