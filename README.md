@@ -213,5 +213,104 @@ for file in ossm-tcp-egress/case-2/**/*.yaml; do oc apply -f $file; done
 Once created the Istio objects, ratings service should works and retrieve data from the _mysql-3_ external database. Bookinfo and bookinfo-custom applications are working properly now.
 
 
+## Cleanup
+### MySQL Instances
+Delete MySQL DeploymentConfigs
+```
+oc process -f mysql-deploy/mysql-template.yaml --param-file=mysql-deploy/params.env | oc delete -f -
+oc process -f mysql-deploy/mysql-template.yaml --param-file=mysql-deploy/params-2.env | oc delete -f -
+oc process -f mysql-deploy/mysql-template.yaml --param-file=mysql-deploy/params-3.env | oc delete -f -
+```
+
+Delete BuildConfigs
+```
+oc delete -f mysql-deploy/buildconfig-mysql-1.yaml
+oc delete -f mysql-deploy/buildconfig-mysql-2.yaml
+oc delete -f mysql-deploy/buildconfig-mysql-3.yaml
+```
+
+Delete secrets
+```
+oc delete secret mysql-credentials-1
+oc delete secret mysql-credentials-2
+oc delete secret mysql-credentials-3
+```
+
+Delete ImageStreams
+```
+oc delete -f mysql-deploy/imagestream-mysql-1.yaml
+oc delete -f mysql-deploy/imagestream-mysql-2.yaml
+oc delete -f mysql-deploy/imagestream-mysql-3.yaml
+```
+
+Delete OCP project
+```
+oc delete project ddbb
+```
+### Bookinfo
+#### Bookinfo
+
+Delete Istio objects
+```
+for file in ossm-tcp-egress/case-1/**/*.yaml; do oc delete -f $file; done
+```
+
+Delete ratings-v2 app
+```
+oc process -f examples/bookinfo/bookinfo-ratings-v2-mysql.yaml --param-file=./examples/bookinfo/params.env | oc delete -f -
+```
+Delete ratings and reviews routing
+```
+oc delete -f examples/bookinfo/virtual-service-ratings-mysql.yaml
+```
+
+Delete Routing objects
+```
+oc delete -f examples/bookinfo/bookinfo-gateway.yaml
+oc delete -f examples/bookinfo/destination-rule-all-mtls.yaml
+oc delete -f examples/bookinfo/ocp-route.yaml
+```
+
+Delete Bookinfo app
+```
+oc delete -f examples/bookinfo/bookinfo.yaml
+```
+
+#### Bookinfo-custom
+
+Delete Istio objects
+```
+for file in ossm-tcp-egress/case-2/**/*.yaml; do oc delete -f $file; done
+```
+
+Delete custom bookinfo application
+```
+oc delete -f examples/bookinfo/custom/bookinfo-custom.yaml
+oc delete -f examples/bookinfo/custom/bookinfo-gateway.yaml
+oc delete -f examples/bookinfo/custom/ocp-route-custom.yaml
+oc delete -f examples/bookinfo/custom/destination-rule-all-mtls_custom.yaml
+```
+
+Delete ratings application with MySQL configuration
+```
+oc process -f examples/bookinfo/custom/bookinfo-ratings-v2-mysql_custom.yaml --param-file=./examples/bookinfo/custom/params.env | oc delete -f -
+```
+
+Delete ratings and reviews routing
+```
+oc delete -f examples/bookinfo/custom/virtual-service-ratings-mysql_custom.yaml
+```
+
+Remove bookinfo from project from Service Mesh Members
+```
+oc delete -f ossm-config/smmr.yaml
+```
+
+Delete OCP project
+```
+oc delete project bookinfo
+```
+
+
 ## Case 2: Egress TCP/TLS using Service Entry. TLS routing from sidecar to egress and TCP routing from egress to external service.
 TO DO
