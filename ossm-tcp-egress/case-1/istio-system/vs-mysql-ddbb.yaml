@@ -14,7 +14,7 @@ spec:
   - match:
     - gateways:
       - istio-default-egress
-      port: 443
+      port: 8443
     route:
     - destination:
         host: mysql.external

@@ -1,0 +1,20 @@
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: my-nginx
+  namespace: istio-system
+spec:
+  exportTo:
+  - '.'
+  endpoints:
+  - address: my-nginx.fperea-mesh-external.svc.cluster.local
+    ports:
+      https: 443
+  hosts:
+  - my-nginx.external
+  location: MESH_EXTERNAL
+  ports:
+  - name: https
+    number: 443
+    protocol: HTTPS
+  resolution: DNS

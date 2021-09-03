@@ -1,0 +1,18 @@
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: egress-my-nginx
+  namespace: istio-system
+spec:
+  host: my-nginx.external
+  exportTo:
+    - .
+  subsets:
+  - name: my-nginx-egress
+    trafficPolicy:
+      tls:
+        mode: MUTUAL
+        clientCertificate: /etc/istio/fperea-mesh-external/nginx-client-certs/tls.crt
+        privateKey: /etc/istio/fperea-mesh-external/nginx-client-certs/tls.key
+        caCertificates: /etc/istio/fperea-mesh-external/nginx-ca-certs/example.com.crt
+        sni: my-nginx.fperea-mesh-external.svc.cluster.local

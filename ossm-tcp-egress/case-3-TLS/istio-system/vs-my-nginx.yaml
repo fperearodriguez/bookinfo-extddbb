@@ -1,0 +1,28 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: my-nginx-egress
+  namespace: istio-system
+spec:
+  exportTo:
+  - .
+  gateways:
+  - istio-default-egress
+  hosts:
+  - my-nginx.external
+  http:
+  - match:
+    - authority:
+        exact: 'my-nginx.external'
+      gateways:
+      - istio-default-egress
+      port: 443
+      rewrite:
+        authority: my-nginx.fperea-mesh-external.svc.cluster.local
+    route:
+    - destination:
+        host: my-nginx.external
+        subset: my-nginx-egress
+        port:
+          number: 443
+      weight: 100

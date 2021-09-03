@@ -19,3 +19,11 @@ spec:
       name: tcp-9443
       number: 9443
       protocol: TCP
+  - hosts:
+    - my-nginx.external
+    port:
+      name: https
+      number: 443
+      protocol: HTTPS
+    tls:
+      mode: ISTIO_MUTUAL

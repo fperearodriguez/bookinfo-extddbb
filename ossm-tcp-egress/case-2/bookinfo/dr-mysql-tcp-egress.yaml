@@ -1,7 +1,7 @@
 apiVersion: networking.istio.io/v1beta1
 kind: DestinationRule
 metadata:
-  name: mysql-egress
+  name: default-egress
   namespace: bookinfo
 spec:
   exportTo:

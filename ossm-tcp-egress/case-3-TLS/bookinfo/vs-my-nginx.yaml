@@ -1,7 +1,7 @@
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
-  name: mysql-egress
+  name: my-nginx
   namespace: bookinfo
 spec:
   exportTo:
@@ -9,16 +9,15 @@ spec:
   gateways:
   - mesh
   hosts:
-  - mysql.external
-  tcp:
+  - my-nginx.external
+  http:
   - match:
-    - gateways:
-      - mesh
-      port: 3306
+    - authority:
+        exact: 'my-nginx.external'
     route:
     - destination:
         host: default-egress.istio-system.svc.cluster.local
         port:
-          number: 8443
-        subset: v2-mysql
+          number: 443
+        subset: v2-mysql-nginx
       weight: 100

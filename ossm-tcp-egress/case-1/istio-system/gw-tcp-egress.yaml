@@ -10,6 +10,6 @@ spec:
   - hosts:
     - mysql.external
     port:
-      name: tcp-443
-      number: 443
+      name: tcp-8443
+      number: 8443
       protocol: TCP
