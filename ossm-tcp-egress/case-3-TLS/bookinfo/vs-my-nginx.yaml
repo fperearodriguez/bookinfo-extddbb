@@ -19,5 +19,5 @@ spec:
         host: default-egress.istio-system.svc.cluster.local
         port:
           number: 443
-        subset: v2-mysql-nginx
+        subset: v2-nginx
       weight: 100

@@ -9,7 +9,7 @@ spec:
   host: default-egress.istio-system.svc.cluster.local
   subsets:
   - name: v2-mysql
-  - name: v2-mysql-nginx
+  - name: v2-nginx
     trafficPolicy:
       tls:
         mode: ISTIO_MUTUAL
