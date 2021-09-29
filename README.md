@@ -8,11 +8,6 @@ In this example, the components used are as follows:
  - [Mysql 8.0](https://dev.mysql.com/doc/relnotes/mysql/8.0/en/)
 
 
-I have worked in two use cases for routing TCP traffic through an Egress Gateway:
-1. TCP routing
-2. TLS routing
-
-
 ## Prerequisites
  - OCP up and running.
  - DNS zone (external hosted zone in this example). Thus, I can use an alias instead of the external service name. The idea is to abstract the applications from the external service's name using the **Service Entry** object.
@@ -90,7 +85,7 @@ All the MySQL instances should be running in _ddbb_ project.
 
 ## Case 1: Egress TCP using Service Entry. TCP routing from sidecar to egress and from egress to external service.
 ### Explanation
-Ratings application consumes external MySQL databases ([Ratings config here](./examples/bookinfo/bookinfo-ratings-v2-mysql.yaml)). This application will connect to _mysql.external_ host, which will be resolved by the Service Entry object. Then, the Service Entry object will route the traffic to two different external databases with different weight 80/20 (the application does not know that it is connecting to two different databases).
+Ratings application consumes external MySQL databases ([Ratings config here](./examples/bookinfo/bookinfo-ratings-v2-mysql.yaml)). This application will connect to _mysql.external_ host, which will be resolved by the Service Entry object. Then, the Service Entry object will route the traffic to two different external databases with different weight 80/20 (the application does not know that it is connecting to two different databases). Also, the ratings-custom application consumes a MySQL database too ([Ratings-custom config here](./examples/bookinfo/custom/bookinfo-ratings-v2-mysql_custom.yaml)).
 
 ### App diagram
 The traffic flow is:
@@ -183,7 +178,7 @@ It is time to deploy the custom bookinfo application. Now, two bookinfo applicat
 Deploy custom bookinfo application
 ```
 oc apply -f examples/bookinfo/custom/bookinfo-custom.yaml
-oc apply -f examples/bookinfo/custom/bookinfo-gateway.yaml
+oc apply -f examples/bookinfo/custom/bookinfo-gateway_custom.yaml
 oc apply -f examples/bookinfo/custom/ocp-route-custom.yaml
 oc apply -f examples/bookinfo/custom/destination-rule-all-mtls_custom.yaml
 ```
@@ -310,7 +305,3 @@ Delete OCP project
 ```
 oc delete project bookinfo
 ```
-
-
-## Case 2: Egress TCP/TLS using Service Entry. TLS routing from sidecar to egress and TCP routing from egress to external service.
-TO DO
