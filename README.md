@@ -83,7 +83,7 @@ oc process -f mysql-deploy/mysql-template.yaml --param-file=mysql-deploy/params-
 
 All the MySQL instances should be running in _ddbb_ project.
 
-## Case 1: Egress TCP using Service Entry. TCP routing from sidecar to egress and from egress to external service.
+## Egress TCP using Service Entry. TCP routing from sidecar to egress and from egress to external service.
 ### Explanation
 Ratings application consumes external MySQL databases ([Ratings config here](./examples/bookinfo/bookinfo-ratings-v2-mysql.yaml)). This application will connect to _mysql.external_ host, which will be resolved by the Service Entry object. Then, the Service Entry object will route the traffic to two different external databases with different weight 80/20 (the application does not know that it is connecting to two different databases). Also, the ratings-custom application consumes a MySQL database too ([Ratings-custom config here](./examples/bookinfo/custom/bookinfo-ratings-v2-mysql_custom.yaml)).
 
@@ -112,7 +112,8 @@ Deploy bookinfo application
 oc apply -f examples/bookinfo/bookinfo.yaml
 ```
 
-Get ingress domain and replace the $EXTERNAL_DOMAIN variable in _examples/bookinfo/bookinfo-gateway.yaml_ and _examples/bookinfo/ocp-route.yaml_ files
+#### Exposing the bookinfo application using the _default_ ingresscontroller 
+Get the default ingress domain and replace the $EXTERNAL_DOMAIN variable in _examples/bookinfo/bookinfo-gateway.yaml_ and _examples/bookinfo/ocp-route.yaml_ files
 ```
 oc -n openshift-ingress-operator get ingresscontrollers default -o json | jq -r '.status.domain'
 ```
@@ -128,6 +129,25 @@ At this point, the bookinfo application is up and running, but ratings applicati
 ```
 export GATEWAY_URL=$(oc get route bookinfo-bookinfo-gateway -n istio-system -o jsonpath='{.spec.host}')
 curl $GATEWAY_URL/productpage -I
+```
+
+#### Exposing the bookinfo application using Ingress Controller sharding by using route labels
+This step is optional. In case you want to use _Ingress Controller sharding_, you need to following the steps below:
+
+1. Create the _sharded ingress crontroller_. For this, you must decide the dns domain that this router will be configured with and how the ingress controller will apply the sharding (route labels, namespace labels). _i.e. apps-sharded.ocp.example.com_. Set the domain in the ([sharded Ingress Controller](./ocp/ingresscontroller.yaml)) and create it (in this case, the sharding is applied using route labels):
+```
+oc apply -f ocp/ingresscontroller.yaml
+```
+
+2. Check that routers have been deployed:
+```
+oc get pod -n openshift-ingress
+```
+
+3. Configure Gateway and Virtual Service:
+```
+oc apply -f examples/bookinfo/sharded-ingress/bookinfo-gateway.yaml
+oc apply -f examples/bookinfo/sharded-ingress/ocp-route.yaml
 ```
 
 ### Set external database as ratings database for bookinfo sample application

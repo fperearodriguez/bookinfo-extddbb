@@ -1,0 +1,16 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: bookinfo-bookinfo-gateway
+  namespace: istio-system
+  labels:
+    istio: ingressgateway
+spec:
+  host: bookinfo-bookinfo-gateway-istio-system.apps-sharded.${EXTERNAL_DOMAIN}
+  port:
+    targetPort: http2
+  to:
+    kind: Service
+    name: istio-ingressgateway
+    weight: 100
+  wildcardPolicy: None
